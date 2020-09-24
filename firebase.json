@@ -15,8 +15,8 @@
       "**/node_modules/**"
     ],
 	"rewrites":[{
-			"source": "/question",
-			"function": "resp"
+			"source": "/getParkingLot",
+			"function": "getParkingLot"
 		}
 	]
   },
@@ -35,5 +35,5 @@
       "enabled": true
     }
   }
-  
+
 }
