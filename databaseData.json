@@ -1,0 +1,13 @@
+{
+	"parkingLot": {
+		"0": {
+			"coordinates": {
+				"lat": "36.0759657",
+				"lng": "-94.1703193"
+			},
+      "name": "South Creekside",
+			"spots": "10",
+			"taken": "0"
+		}
+	}
+}
