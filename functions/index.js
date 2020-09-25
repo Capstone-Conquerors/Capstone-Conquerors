@@ -17,10 +17,11 @@ exports.getParkingLot = functions.https.onRequest((request, response) =>{
 	parkingLot.orderByKey().equalTo("0").once("value").then(function(snapshot){
 		if(snapshot.exists()){
 			console.log("snapshot exists!!");
-			response.json(snapshot.val().coordinates);
-			response.send();
+			response.json(snapshot.toJSON());
+			response.status(200).send();
 		} else {
-			response.end();
+			console.log("No data found!");
+			response.status(404).send();
 		}
 	}, function(error){
 		console.log("Failed " + error.code);
