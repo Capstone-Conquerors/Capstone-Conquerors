@@ -7,6 +7,11 @@ let YELLOW = "#FFFF00";
 let GREEN = "#00CC00";
 let BLACK = "#000000";
 
+const infoFormat = `<div>
+                    <h1>{title}</h1>
+                    <p>Capacity: {capacity}</p>
+                    <p>Available: {available}</p>
+                  </div>`;
 
 function parkingColor(capacity, occupied){
   occupancy = (occupied)/capacity;
@@ -16,7 +21,7 @@ function parkingColor(capacity, occupied){
 }
 
 
-function drawParkingLot(coordinates, capacity, occupated, map){
+function drawParkingLot(coordinates, capacity, occupated, size, map){
   var color = parkingColor(capacity, occupated);
   var parkingDraw = new google.maps.Circle({
     strokeColor: color,
@@ -25,9 +30,26 @@ function drawParkingLot(coordinates, capacity, occupated, map){
     fillColor: color,
     fillOpacity: 0.35,
     center: coordinates,
-    radius:
+    radius: size
   });
   parkingDraw.setMap(map);
+  return parkingDraw;
+}
+var counter = 0;
+function addInfo(pLotArea, info){
+  var infoStr = infoFormat.toString();
+
+  for(const entry in info){
+    infoStr = infoStr.replace(`{${entry}}`, info[entry]);
+  }
+  var infoWindow = new google.maps.InfoWindow({
+    content: infoStr,
+    position: pLotArea.center
+  });
+
+  google.maps.event.addListener(pLotArea, 'click', function(){
+    infoWindow.open(pLotArea.map);
+  });
 }
 
 function initMap(){
@@ -36,7 +58,5 @@ function initMap(){
     zoom: 16
   });
 
-  var parkingLotCoordinates = {lat: 36.075994, lng: -94.170265}
-
-  drawParkingLot(parkingLotCoordinates, 10, 2, map);
+  initTestData(drawParkingLot, addInfo, map);
 }
