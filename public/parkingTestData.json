@@ -14,7 +14,7 @@
       "lat": 36.0645983,
       "lng": -94.1721828
     },
-    "size": 50,
+    "size": 30,
     "capacity": 2149,
     "title": "Harmon Avenue Parking Garage"
   },
@@ -24,7 +24,7 @@
       "lat": 36.063956,
       "lng": -94.178995
     },
-    "size": 50,
+    "size": 30,
     "capacity": 216,
     "title": "Meadow Street Parking Garage"
   },
@@ -34,7 +34,7 @@
       "lat": 36.067897,
       "lng": -94.176224
     },
-    "size": 50,
+    "size": 25,
     "capacity": 586 ,
     "title": "Stadium Drive Parking Garage"
   }

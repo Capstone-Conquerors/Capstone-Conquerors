@@ -1,11 +1,10 @@
 let map;
 
-let coordinates = {lat: 36.0686895, lng: -94.1748471};
-
 let RED = "#FF0000";
 let YELLOW = "#FFFF00";
 let GREEN = "#00CC00";
 let BLACK = "#000000";
+let BLUE = "#1A73E8";
 
 const infoFormat = `<div>
                     <h1>{title}</h1>
@@ -18,6 +17,32 @@ function parkingColor(capacity, occupied){
   if(occupancy >= 0.7) return RED;
   else if(occupancy >= 0.5 ) return YELLOW;
   else return GREEN;
+}
+
+/*
+**Draw a svg image
+**Don't update map center
+*/
+
+function centerMap(map, user){
+  var coords = user.getPosition();
+  coords = {lat: coords.lat(), lng: coords.lng()};
+  map.setCenter(coords);
+}
+
+function updateLocation(map, user){
+  var geo = navigator.geolocation;
+  if(geo){
+    geo.watchPosition((pos) =>{
+      const coords = {
+        lat: pos.coords.latitude,
+        lng: pos.coords.longitude
+      }
+      user.setPosition(coords);
+    });
+  }else{
+    window.alert("We need access to your GPS for correct functioning");
+  }
 }
 
 
@@ -35,7 +60,20 @@ function drawParkingLot(coordinates, capacity, occupated, size, map){
   parkingDraw.setMap(map);
   return parkingDraw;
 }
-var counter = 0;
+
+function drawUserLocation(defaultCoords){
+  var marker = new google.maps.Marker({
+  position: defaultCoords,
+  icon: {
+    path: google.maps.SymbolPath.CIRCLE,
+    strokeColor: BLUE,
+    scale: 5
+  },
+  map: map,
+  });
+  return marker;
+}
+
 function addInfo(pLotArea, info){
   var infoStr = infoFormat.toString();
 
@@ -53,10 +91,20 @@ function addInfo(pLotArea, info){
 }
 
 function initMap(){
+  var defaultCoords = {lat: 36.0686895, lng: -94.1748471};
+  const noPOI = [{
+    featureType: "poi",
+    elementType: "labels",
+    stylers: [{ visibility: "off"}]
+  }];
   map = new google.maps.Map(document.getElementById("map"), {
-    center: coordinates,
-    zoom: 16
+    center: defaultCoords,
+    zoom: 16,
+    clickableIcons: false,
+    styles: noPOI
   });
-
+  var userMarker = drawUserLocation(defaultCoords);
+  updateLocation(map, userMarker);
+  centerMap(map, userMarker);
   initTestData(drawParkingLot, addInfo, map);
 }
