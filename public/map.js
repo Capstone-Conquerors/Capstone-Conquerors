@@ -1,3 +1,5 @@
+let BLACK = "#000000";
+let BLUE = "#1A73E8";
 
 function centerMap(map, user){
   var coords = user.getPosition();
@@ -20,7 +22,20 @@ function updateLocation(map, user){
   }
 }
 
-function initMap(){
+function drawUserLocation(defaultCoords, map){
+  var marker = new google.maps.Marker({
+  position: defaultCoords,
+  icon: {
+    path: google.maps.SymbolPath.CIRCLE,
+    strokeColor: BLUE,
+    scale: 5
+  },
+  map: map,
+  });
+  return marker;
+}
+
+function genMap(){
   var defaultCoords = {lat: 36.0686895, lng: -94.1748471};
   const noPOI = [{
     featureType: "poi",
@@ -33,8 +48,27 @@ function initMap(){
     clickableIcons: false,
     styles: noPOI
   });
-  var userMarker = drawUserLocation(defaultCoords, map);
+
+  return map;
+}
+
+function initMap(){
+  var parkList = {};
+  var userMarker;
+
+  map = genMap();
+  userMarker = drawUserLocation(map.getCenter(), map);
+
   updateLocation(map, userMarker);
   centerMap(map, userMarker);
-  initTestData(drawParkingLot, addInfo, map);
+
+  requestData(parkList, map);
+
+  window.setInterval(()=>{
+    requestData(parkList, map);
+  }, 1000);
+
+  map.addListener('bounds_changed', () =>{
+    requestData(parkList, map);
+  });
 }

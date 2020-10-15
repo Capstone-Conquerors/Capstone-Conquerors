@@ -1,16 +1,16 @@
-function initTestData(drawingFunct, infoFunct, map){
+function requestData(parkList, map){
   $.ajax({
     url: "parkingTestData.json",
     method: "GET",
     dataType: "json",
     success: (response) =>{
       for(const id in response){
-        var parkingLot = response[id];
-        var occupated = Math.round(Math.random() * parkingLot.capacity);
-        var pLotArea = drawingFunct(parkingLot.coordinates, parkingLot.capacity, occupated, parkingLot.size, map);
-
-        parkingLot.available = parkingLot.capacity - occupated;
-        infoFunct(pLotArea, parkingLot);
+        var newLot = response[id];
+        var key = `${newLot.coordinates.lat}-${newLot.coordinates.lng}`;
+        if(parkList[key] == null) parkList[key] = new parkingLot(newLot, map);
+        else{
+          parkList[key].update(newLot);
+        }
       }
     }
   });
