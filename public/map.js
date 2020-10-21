@@ -1,30 +1,9 @@
 let BLACK = "#000000";
 let BLUE = "#1A73E8";
 
-function centerMap(map, user){
-  var coords = user.getPosition();
-  coords = {lat: coords.lat(), lng: coords.lng()};
-  map.setCenter(coords);
-}
-
-function updateLocation(map, user){
-  var geo = navigator.geolocation;
-  if(geo){
-    geo.watchPosition((pos) =>{
-      const coords = {
-        lat: pos.coords.latitude,
-        lng: pos.coords.longitude
-      }
-      user.setPosition(coords);
-    });
-  }else{
-    window.alert("We need access to your GPS for correct functioning");
-  }
-}
-
-function drawUserLocation(defaultCoords, map){
+function drawUserLocation(map){
   var marker = new google.maps.Marker({
-  position: defaultCoords,
+  position: map.getCenter(),
   icon: {
     path: google.maps.SymbolPath.CIRCLE,
     strokeColor: BLUE,
@@ -48,7 +27,7 @@ function genMap(){
     clickableIcons: false,
     styles: noPOI
   });
-
+  console.log("Map created");
   return map;
 }
 
@@ -57,18 +36,20 @@ function initMap(){
   var userMarker;
 
   map = genMap();
-  userMarker = drawUserLocation(map.getCenter(), map);
+  userMarker = drawUserLocation(map);
 
-  updateLocation(map, userMarker);
-  centerMap(map, userMarker);
+  getLocation((pos) =>{updateCoords(pos, map, userMarker)});
+  onLocationChange((pos) =>{updateUserCoords(pos, userMarker)});
 
-  requestData(parkList, map);
+  console.log(map.getBounds());
 
   window.setInterval(()=>{
-    requestData(parkList, map);
+    //requestData(parkList, map);
   }, 1000);
 
   map.addListener('bounds_changed', () =>{
-    requestData(parkList, map);
+    console.log("Bound changed");
+    console.log(map.getBounds());
+    requestData(parkList, map, map.getBounds());
   });
 }
