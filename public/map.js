@@ -41,15 +41,13 @@ function initMap(){
   getLocation((pos) =>{updateCoords(pos, map, userMarker)});
   onLocationChange((pos) =>{updateUserCoords(pos, userMarker)});
 
-  console.log(map.getBounds());
 
   window.setInterval(()=>{
-    //requestData(parkList, map);
+    requestData(parkList, map);
   }, 1000);
 
   map.addListener('bounds_changed', () =>{
-    console.log("Bound changed");
-    console.log(map.getBounds());
-    requestData(parkList, map, map.getBounds());
+    console.log("Updating map");
+    requestData(parkList, map);
   });
 }

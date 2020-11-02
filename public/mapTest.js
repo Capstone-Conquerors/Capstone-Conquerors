@@ -4,7 +4,7 @@ function requestData(parkList, map){
   $.ajax({
     url: "getParkingLot",
     method: "GET",
-    data: coords,
+    data: bounds.toJSON(),
     dataType: "json",
     success: (response) =>{
       updateParkingLots(response, parkList);
