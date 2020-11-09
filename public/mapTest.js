@@ -1,17 +1,25 @@
-function initTestData(drawingFunct, infoFunct, map){
+function requestData(parkList, map){
+  var bounds = map.getBounds();
+  var coords = {sw: bounds.sw, ne: bounds.ne};
   $.ajax({
-    url: "parkingTestData.json",
+    url: "getParkingLot",
     method: "GET",
+    data: bounds.toJSON(),
     dataType: "json",
     success: (response) =>{
-      for(const id in response){
-        var parkingLot = response[id];
-        var occupated = Math.round(Math.random() * parkingLot.capacity);
-        var pLotArea = drawingFunct(parkingLot.coordinates, parkingLot.capacity, occupated, parkingLot.size, map);
-
-        parkingLot.available = parkingLot.capacity - occupated;
-        infoFunct(pLotArea, parkingLot);
-      }
+      updateParkingLots(response, parkList);
     }
   });
+}
+
+function updateParkingLots(response, parkList){
+  console.log(response);
+  for(const id in response){
+    var newLot = response[id];
+    var key = `${newLot.coordinates.lat}-${newLot.coordinates.lng}`;
+    if(parkList[key] == null) parkList[key] = new parkingLot(newLot, map);
+    else{
+      parkList[key].update(newLot);
+    }
+  }
 }

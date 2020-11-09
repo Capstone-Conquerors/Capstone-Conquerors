@@ -1,0 +1,47 @@
+{
+  "parkingLot":[
+    {
+      "coordinates": {
+        "lat": 36.0728818,
+        "lng": -94.1748848
+      },
+      "capacity": 1500,
+      "available": 1000,
+      "size": 50,
+      "title": "Garland Avenue Parking Garage"
+    },
+
+    {
+      "coordinates":{
+        "lat": 36.0645983,
+        "lng": -94.1721828
+      },
+      "size": 30,
+      "capacity": 2149,
+      "available": 100,
+      "title": "Harmon Avenue Parking Garage"
+    },
+
+    {
+      "coordinates":{
+        "lat": 36.063956,
+        "lng": -94.178995
+      },
+      "size": 30,
+      "capacity": 216,
+      "available": 5,
+      "title": "Meadow Street Parking Garage"
+    },
+
+    {
+      "coordinates":{
+        "lat": 36.067897,
+        "lng": -94.176224
+      },
+      "size": 25,
+      "capacity": 586 ,
+      "available": 200,
+      "title": "Stadium Drive Parking Garage"
+    }
+  ]
+}
