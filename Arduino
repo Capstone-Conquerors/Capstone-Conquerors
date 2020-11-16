@@ -1,0 +1,110 @@
+#include <WiFiNINA.h>
+#include <SPI.h>
+#include "arduino_connection.h"
+
+char ssid[] = NETWORK_SSID;
+char pass[] = NETWORK_PASS;
+int status = WL_IDLE_STATUS;
+int analogPin0 = A0;
+int analogPin1 = A1;
+int val1 = 0;
+int val2 = 0;
+
+String hostName = "https://parkinglotcapstone.firebaseio.com";
+int pingResult;
+
+void setup() {
+  Serial.begin(9600);
+  while(!Serial){
+    ;
+  }
+  if(WiFi.status() == WL_NO_MODULE){
+    Serial.println("Communication with WiFi module failed.");
+    while(true);
+  }  
+  
+  String fv = WiFi.firmwareVersion();
+  if(fv < WIFI_FIRMWARE_LATEST_VERSION){
+    Serial.println("Please upgrade the firmware");
+  }
+
+  while(status != WL_CONNECTED) {
+    Serial.print("Attempting to connect to WPA SSID: ");
+    Serial.println(ssid);
+    status = WiFi.begin(ssid, pass);
+    delay(5000);
+  }
+  
+  Serial.print("You are connected to the network");
+  printCurrentNet();
+  printWiFiData();
+}
+
+void loop() { 
+ Serial.print("Pinging ");
+ Serial.print(hostName);
+ Serial.print(": ");
+ pingResult = WiFi.ping(hostName);
+ 
+ if(pingResult >= 0){
+   Serial.print("Success! RTT = ");
+   Serial.print(pingResult);
+   Serial.println(" ms");
+   sensors();
+  }
+  else{
+   Serial.print("Failed! Error Code: ");
+   Serial.println(pingResult);
+  }
+ delay(5000);
+}
+
+void sensors(){
+ val1 = analogRead(analogPin0);
+ val2 = analogRead(analogPin1);
+ Serial.print("Collected value for parking spot 1: ");
+ Serial.println(val1);
+ Serial.print("Collected value for parking spot 2: ");
+ Serial.println(val2);
+ delay(200);
+}
+
+void printCurrentNet(){
+  Serial.print("SSID: ");
+  Serial.println(WiFi.SSID());
+  byte bssid[6];
+  WiFi.BSSID(bssid);
+  Serial.print("BSSID: ");
+  printMacAddress(bssid);
+  long rssi = WiFi.RSSI();
+  Serial.println("signal strength (RSSI): ");
+  Serial.println(rssi);
+  byte encryption = WiFi.encryptionType();
+  Serial.print("Encryption Type: ");
+  Serial.println(encryption, HEX);
+  Serial.println();
+}
+
+void printWiFiData() {
+  IPAddress ip = WiFi.localIP();
+  Serial.print("IP Address: ");
+  Serial.println(ip);
+  Serial.println(ip);
+  byte mac[6];
+  WiFi.macAddress(mac);
+  Serial.print("MAC address: ");
+  printMacAddress(mac);
+}
+
+void printMacAddress(byte mac[]){
+  for(int i = 5; i >= 0; i--) {
+    if(mac[i] < 16) {
+      Serial.print("0");
+    }
+  Serial.print(mac[i], HEX);
+  if(i > 0){
+    Serial.print(":");
+  }
+}
+Serial.println();
+}
