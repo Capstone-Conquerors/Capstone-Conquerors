@@ -13,13 +13,12 @@ function requestData(parkList, map){
 }
 
 function updateParkingLots(response, parkList){
-  console.log(response);
-  for(const id in response){
-    var newLot = response[id];
-    var key = `${newLot.coordinates.lat}-${newLot.coordinates.lng}`;
-    if(parkList[key] == null) parkList[key] = new parkingLot(newLot, map);
+  var parkingData = JSON.parse(response);
+  parkingData.forEach(pLot =>{
+    var key = `${pLot.coordinates.lat}-${pLot.coordinates.lng}`;
+    if(parkList[key] == null) parkList[key] = new parkingLot(pLot, map);
     else{
-      parkList[key].update(newLot);
+      parkList[key].update(pLot);
     }
-  }
+  });
 }

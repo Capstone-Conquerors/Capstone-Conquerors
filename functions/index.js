@@ -24,7 +24,9 @@ exports.getParkingLot = functions.https.onRequest((request, response) =>{
 		console.log(`Lat: [${coords.south}, ${coords.north}]`)
 
 		if(snapshot.exists()){
-			response.json(snapshot.toJSON());
+			filteredData = lngFilter(snapshot, parseFloat(coords.west), parseFloat(coords.east));
+			console.log(filteredData);
+			response.json(filteredData);
 			response.status(200).send();
 		}else{
 			console.log("Data not found");
@@ -32,3 +34,22 @@ exports.getParkingLot = functions.https.onRequest((request, response) =>{
 		}
 	});
 })
+
+/***********************************************************************
+lngFilter(snapshot, sLng, nLng)
+	sLng: float value representing the south lng coordindates
+	nLng: float value representing the nourth lng coordindates
+	snapshot: dataSnapshot object that contains parking lot entries
+	returns json object with parking lot entries between the sLng and nLng
+					boundaries. Entries returned do not contain parkingLot id
+************************************************************************/
+function lngFilter(snapshot, wLng, eLng){
+	var lngFilteredData  = [];
+	snapshot.forEach((parkingLot) => {
+		var pLData = parkingLot.val()
+		if (pLData.coordinates.lng >= wLng && pLData.coordinates.lng <= eLng){
+			lngFilteredData.push(pLData);
+		}
+	});
+	return JSON.stringify(lngFilteredData);
+}
