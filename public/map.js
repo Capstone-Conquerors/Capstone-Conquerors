@@ -44,10 +44,14 @@ function initMap(){
 
   window.setInterval(()=>{
     requestData(parkList, map);
-  }, 1000);
+  }, 750);
 
+  /*
+  Updates map everytime coordisnates change
+  Unnecessary
   map.addListener('bounds_changed', () =>{
     console.log("Updating map");
     requestData(parkList, map);
   });
+  */
 }

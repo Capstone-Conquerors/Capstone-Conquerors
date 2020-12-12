@@ -37,7 +37,7 @@ exports.getParkingLot = functions.https.onRequest((request, response) =>{
 
 exports.updateParkingData = functions.https.onRequest((request, response) =>{
 	/*
-	sensInfo = JSON.parse(request.rawBody);
+	sensInfo = request.query
 	*/
 	sensInfo = {
 		id: "0-0",
@@ -62,7 +62,7 @@ function updateSpot(parkingId, sensorId, status){
 	var entryPath = `${parkingId}/${sensorId}`
 	var update = {};
 	update[entryPath] = status;
-	sensors.update(update);
+	return sensors.update(update);
 }
 
 /***********************************************************************
@@ -72,23 +72,22 @@ updateAvailableCount(parkId)
 	the parking lot are available
 ************************************************************************/
 function updateAvailableCount(parkId){
-	console.log("Updating available");
 	var path = `${parkId}/available`;
+	console.log(`Updating: ${path}`);
 	var newData = {};
 	var availableCount = 0;
 	sensors.child(parkId).on("value", function(snapshot){
 		if(snapshot.exists()){
-			console.log(snapshot.val());
 			snapshot.forEach((sensor, i) => {
 				var available = sensor.val();
-				if(available == true)
+				if(available == true){
 				 	availableCount += 1;
+				}
 			});
+			newData[path] = availableCount;
+			parkingLot.update(newData);
 		}
 	});
-	console.log(`New available Count: ${availableCount}`);
-	newData[path] = availableCount;
-	parkingLot.update(newData);
 }
 
 /***********************************************************************
