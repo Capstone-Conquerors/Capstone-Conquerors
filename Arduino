@@ -18,7 +18,7 @@ char server[] = "https://parkinglotcapstone.firebaseio.com";
 String postData1;
 String postData2;
 String postVariable1 = "sensor= ";
-String postVariable2 = "availability= ";
+String postVariable2 = " availability= ";
 
 WiFiSSLClient client;
 
@@ -62,11 +62,13 @@ if(client.connect(server,443)){
   client.println(postData1.length(), postData2.length());
   client.println();
   client.print(postData1);
+  client.print(postData2);
 }
 if(client.connected()){
   client.stop();
 }
 Serial.println(postData1);
+Serial.println(postData2);
 delay(2000);
 }
 void sensors(){
