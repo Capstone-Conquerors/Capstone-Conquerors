@@ -43,5 +43,10 @@
       "available": 200,
       "title": "Stadium Drive Parking Garage"
     }
-  ]
+  ],
+  "Sensors": {
+    "0":{
+      "0": false
+    }
+  }
 }

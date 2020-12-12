@@ -10,7 +10,7 @@ admin.initializeApp({
 
 var db = admin.database();
 var parkingLot = db.ref("parkingLot");
-
+var sensors = db.ref("Sensors");
 //Reference for functions used can be found in:
 //https://firebase.google.com/docs/reference/js/firebase.database.Query
 
@@ -33,7 +33,63 @@ exports.getParkingLot = functions.https.onRequest((request, response) =>{
 			response.status(404).send();
 		}
 	});
-})
+});
+
+exports.updateParkingData = functions.https.onRequest((request, response) =>{
+	/*
+	sensInfo = JSON.parse(request.rawBody);
+	*/
+	sensInfo = {
+		id: "0-0",
+		status: true
+	}
+	ids =  sensInfo.id.split("-");
+	updateSpot(ids[0], ids[1], sensInfo.status);
+	updateAvailableCount(ids[0]);
+	response.status(200).send();
+});
+
+
+/***********************************************************************
+updateAvailableCount(parkId)
+	parkingId: Key of parking spot where sensor is located
+	sensorId: Unique ID of sensor for the given parking Spot
+	status: availabilitu of parking spot
+	Updates whether a parkign spot is available or not.
+************************************************************************/
+function updateSpot(parkingId, sensorId, status){
+	console.log("Updating Spot");
+	var entryPath = `${parkingId}/${sensorId}`
+	var update = {};
+	update[entryPath] = status;
+	sensors.update(update);
+}
+
+/***********************************************************************
+updateAvailableCount(parkId)
+	parkId: Key of park whose availability count  has to be updated
+	Updates availability count by counting how many sensor that belong to
+	the parking lot are available
+************************************************************************/
+function updateAvailableCount(parkId){
+	console.log("Updating available");
+	var path = `${parkId}/available`;
+	var newData = {};
+	var availableCount = 0;
+	sensors.child(parkId).on("value", function(snapshot){
+		if(snapshot.exists()){
+			console.log(snapshot.val());
+			snapshot.forEach((sensor, i) => {
+				var available = sensor.val();
+				if(available == true)
+				 	availableCount += 1;
+			});
+		}
+	});
+	console.log(`New available Count: ${availableCount}`);
+	newData[path] = availableCount;
+	parkingLot.update(newData);
+}
 
 /***********************************************************************
 lngFilter(snapshot, sLng, nLng)
