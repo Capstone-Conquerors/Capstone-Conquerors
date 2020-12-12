@@ -9,11 +9,18 @@ int analogPin0 = A0;
 int analogPin1 = A1;
 int val1 = 0;
 int val2 = 0;
-char avail[] = "AVAILABLE";
-char full[] = "FULL";
+int avail1 = 0;
+int avail2 = 0;
+int spot1 = 0;
+int spot2 = 0;
+char server[] = "https://parkinglotcapstone.firebaseio.com";
 
-String hostName = "https://parkinglotcapstone.firebaseio.com";
-int pingResult;
+String postData1;
+String postData2;
+String postVariable1 = "sensor= ";
+String postVariable2 = "availability= ";
+
+WiFiSSLClient client;
 
 void setup() {
   Serial.begin(9600);
@@ -31,7 +38,7 @@ void setup() {
   }
 
   while(status != WL_CONNECTED) {
-    Serial.print("Attempting to connect to WPA SSID: ");
+    Serial.print("Attempting to connect to Network: ");
     Serial.println(ssid);
     status = WiFi.begin(ssid, pass);
     delay(5000);
@@ -43,45 +50,46 @@ void setup() {
 }
 
 void loop() { 
- Serial.print("Pinging ");
- Serial.print(hostName);
- Serial.print(": ");
- pingResult = WiFi.ping(hostName);
- 
- if(pingResult >= 0){
-   Serial.print("Success! RTT = ");
-   Serial.print(pingResult);
-   Serial.println(" ms");
-   sensors();
-  }
-  else{
-   Serial.print("Failed! Error Code: ");
-   Serial.println(pingResult);
-  }
- delay(3000);
-}
+sensors();
+postData1 = postVariable1 + spot1 + postVariable2 + avail1;
+postData2 = postVariable1 + spot2 + postVariable2 + avail2;
 
+if(client.connect(server,443)){
+  Serial.println("connected to server");
+  client.println("POST /updateSpot HTTP/1.1");
+  client.println("Host: parkinglotcapstone.firebaseio.com");
+  client.println("Content-Type: application/x-www-form-urlencoded");
+  client.println(postData1.length(), postData2.length());
+  client.println();
+  client.print(postData1);
+}
+if(client.connected()){
+  client.stop();
+}
+Serial.println(postData1);
+delay(2000);
+}
 void sensors(){
  val1 = analogRead(analogPin0);
  val2 = analogRead(analogPin1);
-
+//0 = empty; 1 = full;
  switch(val1){
   case 0 ... 88:
-  Serial.print("Parking Spot 1: ");
-  Serial.println(avail);
+  spot1 = 00001;
+  avail1 = 0;
   break;
   default:
-  Serial.print("Parking Spot 1: ");
-  Serial.println(full);  
+  spot1 = 00001;
+  avail1 = 1;  
  }
  switch(val2){
   case 0 ... 88:
-  Serial.print("Parking Spot 2: ");
-  Serial.println(avail);
+  spot2 = 00002;
+  avail2 = 0;
   break;
   default:
-  Serial.print("Parking Spot 2: ");
-  Serial.println(full);
+  spot2 = 00002;
+  avail1 = 1;
  }
  delay(200);
 }
