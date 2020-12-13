@@ -1,7 +1,9 @@
+//Libraries and network definitions
 #include <WiFiNINA.h>
 #include <SPI.h>
 #include "arduino_connection.h"
 
+//System Variables and Declaration
 char ssid[] = NETWORK_SSID;
 char pass[] = NETWORK_PASS;
 int status = WL_IDLE_STATUS;
@@ -9,16 +11,18 @@ int analogPin0 = A0;
 int analogPin1 = A1;
 int val1 = 0;
 int val2 = 0;
-int avail1 = 0;
-int avail2 = 0;
+bool avail1 = 0;
+bool avail2 = 0;
 int spot1 = 0;
 int spot2 = 0;
-char server[] = "https://parkinglotcapstone.firebaseio.com";
+char server[] = "https://parkinglotcapstone.web.app";
 
+
+//POST Variables
 String postData1;
 String postData2;
-String postVariable1 = "sensor= ";
-String postVariable2 = " availability= ";
+String postVariable1 = "id";
+String postVariable2 = "available";
 
 WiFiSSLClient client;
 
@@ -49,28 +53,41 @@ void setup() {
   printWiFiData();
 }
 
+//******MAIN*******
 void loop() { 
+
 sensors();
 postData1 = postVariable1 + spot1 + postVariable2 + avail1;
 postData2 = postVariable1 + spot2 + postVariable2 + avail2;
+  post("0", spot1, avail1);
+  post("0", spot2, avail2);
+  delay(2000);
+}
 
-if(client.connect(server,443)){
-  Serial.println("connected to server");
-  client.println("POST /updateSpot HTTP/1.1");
-  client.println("Host: parkinglotcapstone.firebaseio.com");
-  client.println("Content-Type: application/x-www-form-urlencoded");
-  client.println(postData1.length(), postData2.length());
-  client.println();
-  client.print(postData1);
-  client.print(postData2);
+void post(String parkID, int spotID, bool avail){
+//Connect to server and POST
+  String data = "{\"id\":\"" + parkID + "-" + spotID + "\",\"status\": " + (avail ? "true" : "false") + "}";
+  if(client.connect(server,443)){
+    Serial.println("connected to server");
+    client.println("POST /updateSpot HTTP/1.1");
+    client.println("Host: parkinglotcapstone.web.app");
+    client.println("Content-Type: application/json");
+    client.print("Content-Length: ");
+    client.println(data.length());
+    client.println();
+    client.print(data);
+  }
+  else{
+    Serial.println("not connected");
+  }
+  
+  if(client.connected()){
+    client.stop();
+  }
+  Serial.println(data);
 }
-if(client.connected()){
-  client.stop();
-}
-Serial.println(postData1);
-Serial.println(postData2);
-delay(2000);
-}
+
+//Collect information from sensors
 void sensors(){
  val1 = analogRead(analogPin0);
  val2 = analogRead(analogPin1);
@@ -78,24 +95,25 @@ void sensors(){
  switch(val1){
   case 0 ... 88:
   spot1 = 00001;
-  avail1 = 0;
+  avail1 = true;
   break;
   default:
   spot1 = 00001;
-  avail1 = 1;  
+  avail1 = false;  
  }
  switch(val2){
   case 0 ... 88:
   spot2 = 00002;
-  avail2 = 0;
+  avail2 = true;
   break;
   default:
   spot2 = 00002;
-  avail1 = 1;
+  avail1 = false;
  }
  delay(200);
 }
 
+//Ensure connection
 void printCurrentNet(){
   Serial.print("SSID: ");
   Serial.println(WiFi.SSID());
