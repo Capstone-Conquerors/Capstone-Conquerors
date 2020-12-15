@@ -37,7 +37,11 @@ function initMap(){
   getLocation((pos) =>{updateCoords(pos, map, userMarker)});
   onLocationChange((pos) =>{updateUserCoords(pos, userMarker)});
 
-
+  $(".centerButton").click(function(){
+      map.setCenter(userMarker.getPosition());
+      map.setZoom(16);
+    });
+    
   window.setInterval(()=>{
     requestData(parkList, map);
   }, 750);
