@@ -19,7 +19,7 @@ exports.getParkingLot = functions.https.onRequest((request, response) =>{
 	var coords = request.query;
 	//Limited by a single order by call
 	//parkingLot.orderByChild("coordinates/lng").startAt(parseFloat(coords.west)).endAt(parseFloat(coords.east));
-	parkingLot.orderByChild("coordinates/lat").startAt(parseFloat(coords.south)).endAt(parseFloat(coords.north)).on("value", function(snapshot){
+	parkingLot.orderByChild("coordinates/lat").startAt(parseFloat(coords.south)).endAt(parseFloat(coords.north)).on("value",(snapshot) =>{
 		console.log(`Lng: [${coords.west}, ${coords.east}]`)
 		console.log(`Lat: [${coords.south}, ${coords.north}]`)
 
@@ -36,13 +36,12 @@ exports.getParkingLot = functions.https.onRequest((request, response) =>{
 });
 
 exports.updateParkingData = functions.https.onRequest((request, response) =>{
+	sensInfo = JSON.parse(request.rawBody);
 	/*
-	sensInfo = request.query
-	*/
 	sensInfo = {
 		id: "0-0",
 		status: true
-	}
+	}*/
 	ids =  sensInfo.id.split("-");
 	updateSpot(ids[0], ids[1], sensInfo.status);
 	updateAvailableCount(ids[0]);
@@ -76,11 +75,11 @@ function updateAvailableCount(parkId){
 	console.log(`Updating: ${path}`);
 	var newData = {};
 	var availableCount = 0;
-	sensors.child(parkId).on("value", function(snapshot){
+	sensors.child(parkId).on("value", (snapshot) =>{
 		if(snapshot.exists()){
 			snapshot.forEach((sensor, i) => {
 				var available = sensor.val();
-				if(available == true){
+				if(available === true){
 				 	availableCount += 1;
 				}
 			});
