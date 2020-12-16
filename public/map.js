@@ -16,16 +16,12 @@ function drawUserLocation(map){
 
 function genMap(){
   var defaultCoords = {lat: 36.0686895, lng: -94.1748471};
-  const noPOI = [{
-    featureType: "poi",
-    elementType: "labels",
-    stylers: [{ visibility: "off"}]
-  }];
   var map = new google.maps.Map(document.getElementById("map"), {
     center: defaultCoords,
     zoom: 16,
     clickableIcons: false,
-    styles: noPOI
+    mapId: "614d50da4f0aad73",
+    disableDefaultUI: true
   });
   console.log("Map created");
   return map;
@@ -41,13 +37,21 @@ function initMap(){
   getLocation((pos) =>{updateCoords(pos, map, userMarker)});
   onLocationChange((pos) =>{updateUserCoords(pos, userMarker)});
 
-
+  $(".centerButton").click(function(){
+      map.setCenter(userMarker.getPosition());
+      map.setZoom(16);
+    });
+    
   window.setInterval(()=>{
     requestData(parkList, map);
-  }, 1000);
+  }, 750);
 
+  /*
+  Updates map everytime coordisnates change
+  Unnecessary
   map.addListener('bounds_changed', () =>{
     console.log("Updating map");
     requestData(parkList, map);
   });
+  */
 }
